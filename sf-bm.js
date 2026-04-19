@@ -1,4 +1,4 @@
-// ── Tab switching (index page) ─────────────────────────────
+// ── Tab switching ──────────────────────────────────────────
 function showTab(id, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -6,7 +6,40 @@ function showTab(id, btn) {
   btn.classList.add('active');
 }
 
-// ── Row management ─────────────────────────────────────────
+// ── Support management ─────────────────────────────────────
+let supportCount = 0;
+
+function addSupport() {
+  var container = document.getElementById('supportsContainer');
+  if (!container) return;
+  if (container.children.length >= 2) {
+    alert('Maximum 2 supports allowed.'); return;
+  }
+  supportCount++;
+  var id = 'sup-' + supportCount;
+  var row = document.createElement('div');
+  row.className = 'load-row type-point';
+  row.id = id;
+  row.style.borderLeftColor = '#e67e22';
+  row.innerHTML =
+    '<span class="load-num" style="color:#e67e22;">Support #' + supportCount + '</span>' +
+    '<div class="input-group">' +
+      '<label>Type</label>' +
+      '<select class="sup-type">' +
+        '<option value="pin">Pin</option>' +
+        '<option value="roller">Roller</option>' +
+        '<option value="fixed">Fixed</option>' +
+      '</select>' +
+    '</div>' +
+    '<div class="input-group">' +
+      '<label>Position (m from left)</label>' +
+      '<input type="number" class="sup-pos" placeholder="e.g. 0" min="0" step="0.1"/>' +
+    '</div>' +
+    '<button class="remove-btn" onclick="removeRow(\'' + id + '\')">&#x2715;</button>';
+  container.appendChild(row);
+}
+
+// ── Load row management ────────────────────────────────────
 let rowCount = 0;
 
 const rowConfig = {
@@ -20,9 +53,9 @@ const rowConfig = {
   udl: {
     label: 'UDL',
     fields: [
-      { cls: 'load-w', label: 'Intensity w (kN/m)',  placeholder: 'e.g. 5' },
-      { cls: 'load-a', label: 'Start a (m from A)',  placeholder: 'e.g. 1' },
-      { cls: 'load-b', label: 'End b (m from A)',    placeholder: 'e.g. 4' }
+      { cls: 'load-w', label: 'Intensity w (kN/m)', placeholder: 'e.g. 5' },
+      { cls: 'load-a', label: 'Start a (m from A)', placeholder: 'e.g. 1' },
+      { cls: 'load-b', label: 'End b (m from A)',   placeholder: 'e.g. 4' }
     ]
   },
   moment: {
@@ -36,24 +69,21 @@ const rowConfig = {
 
 function addRow(type) {
   rowCount++;
-  const cfg = rowConfig[type];
-  const container = document.getElementById('loadsContainer');
-  const row = document.createElement('div');
+  var cfg = rowConfig[type];
+  var container = document.getElementById('loadsContainer');
+  var row = document.createElement('div');
   row.className = 'load-row type-' + type;
   row.id = 'row-' + rowCount;
 
-  const fieldsHTML = cfg.fields.map(function(f) {
-    return '<div class="input-group">' +
-      '<label>' + f.label + '</label>' +
-      '<input type="number" class="' + f.cls + '" placeholder="' + f.placeholder + '" step="0.1"/>' +
-      '</div>';
+  var fieldsHTML = cfg.fields.map(function(f) {
+    return '<div class="input-group"><label>' + f.label + '</label>' +
+      '<input type="number" class="' + f.cls + '" placeholder="' + f.placeholder + '" step="0.1"/></div>';
   }).join('');
 
   row.innerHTML =
     '<span class="load-num">' + cfg.label + ' #' + rowCount + '</span>' +
     fieldsHTML +
     '<button class="remove-btn" onclick="removeRow(\'row-' + rowCount + '\')">&#x2715;</button>';
-
   container.appendChild(row);
 }
 
@@ -64,9 +94,11 @@ function removeRow(id) {
 
 function clearAll() {
   document.getElementById('loadsContainer').innerHTML = '';
+  document.getElementById('supportsContainer').innerHTML = '';
   document.getElementById('results').classList.add('hidden');
   document.getElementById('spanL').value = '';
-  rowCount = 0;
+  rowCount = 0; supportCount = 0;
+  addSupport(); addSupport();   // reset with 2 default supports
   addRow('point');
 }
 
@@ -75,12 +107,33 @@ function calculate() {
   var L = parseFloat(document.getElementById('spanL').value);
   if (isNaN(L) || L <= 0) { alert('Enter a valid beam span L.'); return; }
 
-  var support = document.getElementById('supportType').value;
-  var rows = document.querySelectorAll('.load-row');
+  // Read supports
+  var supRows = document.querySelectorAll('#supportsContainer .load-row');
+  if (supRows.length === 0) { alert('Add at least one support.'); return; }
+
+  var supports = [];
+  for (var i = 0; i < supRows.length; i++) {
+    var stype = supRows[i].querySelector('.sup-type').value;
+    var spos  = parseFloat(supRows[i].querySelector('.sup-pos').value);
+    if (isNaN(spos) || spos < 0 || spos > L) {
+      alert('Support position must be between 0 and ' + L + ' m.'); return;
+    }
+    supports.push({ type: stype, pos: spos });
+  }
+  // Sort by position
+  supports.sort(function(a, b) { return a.pos - b.pos; });
+
+  // Determine beam type from supports
+  var hasFixed  = supports.some(function(s) { return s.type === 'fixed'; });
+  var support   = hasFixed ? 'cantilever' : 'simply';
+  var posA      = supports[0].pos;
+  var posB      = supports.length > 1 ? supports[supports.length - 1].pos : L;
+
+  // Read loads
+  var rows = document.querySelectorAll('#loadsContainer .load-row');
   if (rows.length === 0) { alert('Add at least one load.'); return; }
 
   var pointLoads = [], udls = [], moments = [];
-
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     if (row.classList.contains('type-point')) {
@@ -93,7 +146,7 @@ function calculate() {
       var a1 = parseFloat(row.querySelector('.load-a').value);
       var b1 = parseFloat(row.querySelector('.load-b').value);
       if (isNaN(w) || isNaN(a1) || isNaN(b1) || a1 < 0 || b1 > L || a1 >= b1) {
-        alert('Check UDL values. Start must be less than End.'); return;
+        alert('Check UDL values.'); return;
       }
       udls.push({ w: w, a: a1, b: b1 });
     } else if (row.classList.contains('type-moment')) {
@@ -105,50 +158,65 @@ function calculate() {
   }
 
   var RA, RB, MA_fixed = 0;
+  var span = posB - posA;
 
-  if (support === 'simply') {
+  if (support === 'simply' && supports.length >= 2) {
+    // Simply supported: take moments about posA to find RB
     var sumMomA = 0;
-    for (var j = 0; j < pointLoads.length; j++) sumMomA += pointLoads[j].P * pointLoads[j].a;
-    for (var j = 0; j < udls.length; j++)       sumMomA += udls[j].w * (udls[j].b - udls[j].a) * ((udls[j].a + udls[j].b) / 2);
+    for (var j = 0; j < pointLoads.length; j++) sumMomA += pointLoads[j].P * (pointLoads[j].a - posA);
+    for (var j = 0; j < udls.length; j++)       sumMomA += udls[j].w * (udls[j].b - udls[j].a) * ((udls[j].a + udls[j].b) / 2 - posA);
     for (var j = 0; j < moments.length; j++)    sumMomA += moments[j].M;
-    RB = sumMomA / L;
+    RB = span > 0 ? sumMomA / span : 0;
 
     var sumFy = 0;
     for (var j = 0; j < pointLoads.length; j++) sumFy += pointLoads[j].P;
     for (var j = 0; j < udls.length; j++)       sumFy += udls[j].w * (udls[j].b - udls[j].a);
     RA = sumFy - RB;
 
-    document.getElementById('raLabel').innerHTML = 'Reaction at A (R<sub>A</sub>)';
-    document.getElementById('rbLabel').innerHTML = 'Reaction at B (R<sub>B</sub>)';
+    document.getElementById('raLabel').innerHTML = 'R<sub>A</sub> at ' + posA + ' m';
+    document.getElementById('rbLabel').innerHTML = 'R<sub>B</sub> at ' + posB + ' m';
     document.getElementById('ra').textContent = RA.toFixed(2) + ' kN';
     document.getElementById('rb').textContent = RB.toFixed(2) + ' kN';
   } else {
+    // Cantilever / single fixed support
     var sumFy2 = 0;
     for (var j = 0; j < pointLoads.length; j++) sumFy2 += pointLoads[j].P;
     for (var j = 0; j < udls.length; j++)       sumFy2 += udls[j].w * (udls[j].b - udls[j].a);
     RA = sumFy2; RB = 0;
 
     var sumMomA2 = 0;
-    for (var j = 0; j < pointLoads.length; j++) sumMomA2 += pointLoads[j].P * pointLoads[j].a;
-    for (var j = 0; j < udls.length; j++)       sumMomA2 += udls[j].w * (udls[j].b - udls[j].a) * ((udls[j].a + udls[j].b) / 2);
+    for (var j = 0; j < pointLoads.length; j++) sumMomA2 += pointLoads[j].P * (pointLoads[j].a - posA);
+    for (var j = 0; j < udls.length; j++)       sumMomA2 += udls[j].w * (udls[j].b - udls[j].a) * ((udls[j].a + udls[j].b) / 2 - posA);
     for (var j = 0; j < moments.length; j++)    sumMomA2 += moments[j].M;
     MA_fixed = sumMomA2;
 
-    document.getElementById('raLabel').innerHTML = 'Reaction at A (R<sub>A</sub>)';
+    document.getElementById('raLabel').innerHTML = 'R<sub>A</sub> at ' + posA + ' m';
     document.getElementById('rbLabel').innerHTML = 'Fixed Moment M<sub>A</sub>';
     document.getElementById('ra').textContent = RA.toFixed(2) + ' kN';
     document.getElementById('rb').textContent = MA_fixed.toFixed(2) + ' kN·m';
   }
 
-  // Sample V(x) and M(x)
+  // Sample V(x) and M(x) across full beam length
   var STEPS = 800;
   var sfArr = [], bmArr = [];
 
   for (var s = 0; s <= STEPS; s++) {
-    var x = (s / STEPS) * L;
-    var V  = RA;
-    var Mx = (support === 'simply') ? RA * x : -MA_fixed + RA * x;
+    var x  = (s / STEPS) * L;
 
+    // Start from left end — accumulate all forces to the LEFT of x
+    var V  = 0;
+    var Mx = 0;
+
+    // Add reaction at posA if it is to the left of (or at) x
+    if (posA <= x) { V += RA; Mx += RA * (x - posA); }
+
+    // Add reaction at posB for simply supported
+    if (support === 'simply' && posB <= x) { V += RB; Mx += RB * (x - posB); }
+
+    // Fixed moment at posA for cantilever (acts as a counter-moment)
+    if (support === 'cantilever' && posA <= x) { Mx -= MA_fixed; }
+
+    // Subtract loads to the left of x
     for (var j = 0; j < pointLoads.length; j++) {
       var pl = pointLoads[j];
       if (pl.a < x)                        { V -= pl.P; Mx -= pl.P * (x - pl.a); }
@@ -179,12 +247,12 @@ function calculate() {
   document.getElementById('maxBM').textContent = maxBM.toFixed(2) + ' kN·m';
   document.getElementById('results').classList.remove('hidden');
 
-  drawBeam(L, support, pointLoads, udls, moments);
-  drawDiagrams(L, support, sfArr, bmArr, maxSF, maxBM);
+  drawBeam(L, supports, pointLoads, udls, moments);
+  drawDiagrams(L, support, sfArr, bmArr, maxSF, maxBM, posA, posB);
 }
 
 // ── Beam visualisation ─────────────────────────────────────
-function drawBeam(L, support, pointLoads, udls, moments) {
+function drawBeam(L, supports, pointLoads, udls, moments) {
   var canvas = document.getElementById('beamCanvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
@@ -195,7 +263,7 @@ function drawBeam(L, support, pointLoads, udls, moments) {
   var beamW = W - padL - padR;
   var scale = beamW / L;
   var beamY = 62;
-  var cx = function(x) { return padL + x * scale; };
+  var bx = function(x) { return padL + x * scale; };
 
   // Beam bar
   ctx.fillStyle = '#4a90d9';
@@ -203,193 +271,186 @@ function drawBeam(L, support, pointLoads, udls, moments) {
   ctx.roundRect(padL, beamY - 6, beamW, 12, 3);
   ctx.fill();
 
-  // Supports
-  if (support === 'simply') {
-    // Pin at A
+  // Draw each support at its position
+  supports.forEach(function(s) {
+    var px = bx(s.pos);
     ctx.fillStyle = '#e67e22';
-    ctx.beginPath();
-    ctx.moveTo(cx(0), beamY + 6);
-    ctx.lineTo(cx(0) - 14, beamY + 30);
-    ctx.lineTo(cx(0) + 14, beamY + 30);
-    ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = '#e67e22'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx(0) - 18, beamY + 32); ctx.lineTo(cx(0) + 18, beamY + 32); ctx.stroke();
-    // Roller at B
-    ctx.fillStyle = '#e67e22';
-    ctx.beginPath();
-    ctx.moveTo(cx(L), beamY + 6);
-    ctx.lineTo(cx(L) - 14, beamY + 30);
-    ctx.lineTo(cx(L) + 14, beamY + 30);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cx(L), beamY + 36, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#555'; ctx.font = '11px Segoe UI';
-    ctx.fillText('A (Pin)',    cx(0) - 20, beamY + 48);
-    ctx.fillText('B (Roller)', cx(L) - 24, beamY + 52);
-  } else {
-    // Fixed wall at A
-    ctx.fillStyle = '#555';
-    ctx.fillRect(padL - 18, beamY - 28, 14, 56);
-    ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
-    for (var y = beamY - 28; y < beamY + 28; y += 8) {
-      ctx.beginPath(); ctx.moveTo(padL - 18, y); ctx.lineTo(padL - 30, y + 8); ctx.stroke();
+    if (s.type === 'fixed') {
+      ctx.fillStyle = '#555';
+      ctx.fillRect(px - 7, beamY - 28, 14, 56);
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+      for (var y = beamY - 28; y < beamY + 28; y += 8) {
+        ctx.beginPath(); ctx.moveTo(px - 7, y); ctx.lineTo(px - 19, y + 8); ctx.stroke();
+      }
+      ctx.fillStyle = '#555'; ctx.font = '10px Segoe UI';
+      ctx.fillText('Fixed(' + s.pos + 'm)', px - 22, beamY + 46);
+    } else if (s.type === 'pin') {
+      ctx.fillStyle = '#e67e22';
+      ctx.beginPath();
+      ctx.moveTo(px, beamY + 6); ctx.lineTo(px - 13, beamY + 28); ctx.lineTo(px + 13, beamY + 28);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#e67e22'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(px - 17, beamY + 30); ctx.lineTo(px + 17, beamY + 30); ctx.stroke();
+      ctx.fillStyle = '#555'; ctx.font = '10px Segoe UI';
+      ctx.fillText('Pin(' + s.pos + 'm)', px - 18, beamY + 46);
+    } else {
+      // Roller
+      ctx.fillStyle = '#e67e22';
+      ctx.beginPath();
+      ctx.moveTo(px, beamY + 6); ctx.lineTo(px - 13, beamY + 28); ctx.lineTo(px + 13, beamY + 28);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.arc(px, beamY + 34, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#555'; ctx.font = '10px Segoe UI';
+      ctx.fillText('Roller(' + s.pos + 'm)', px - 22, beamY + 50);
     }
-    ctx.fillStyle = '#555'; ctx.font = '11px Segoe UI';
-    ctx.fillText('A (Fixed)', padL - 16, beamY + 48);
-    ctx.fillText('B (Free)',  cx(L) - 16, beamY + 48);
-  }
+  });
 
   // UDLs
   for (var i = 0; i < udls.length; i++) {
     var ul = udls[i];
     ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 1.5;
     var step = Math.max(14, (ul.b - ul.a) * scale / 7);
-    for (var px = cx(ul.a); px <= cx(ul.b) + 1; px += step) {
-      ctx.beginPath(); ctx.moveTo(px, beamY - 28); ctx.lineTo(px, beamY - 8); ctx.stroke();
+    for (var px2 = bx(ul.a); px2 <= bx(ul.b) + 1; px2 += step) {
+      ctx.beginPath(); ctx.moveTo(px2, beamY - 28); ctx.lineTo(px2, beamY - 8); ctx.stroke();
       ctx.fillStyle = '#27ae60';
-      ctx.beginPath();
-      ctx.moveTo(px, beamY - 8);
-      ctx.lineTo(px - 4, beamY - 16);
-      ctx.lineTo(px + 4, beamY - 16);
-      ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(px2, beamY - 8); ctx.lineTo(px2 - 4, beamY - 16); ctx.lineTo(px2 + 4, beamY - 16); ctx.closePath(); ctx.fill();
     }
-    ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(cx(ul.a), beamY - 28); ctx.lineTo(cx(ul.b), beamY - 28); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx(ul.a), beamY - 28); ctx.lineTo(bx(ul.b), beamY - 28); ctx.stroke();
     ctx.fillStyle = '#27ae60'; ctx.font = '10px Segoe UI';
-    ctx.fillText('w=' + ul.w + ' kN/m', (cx(ul.a) + cx(ul.b)) / 2 - 24, beamY - 32);
+    ctx.fillText('w=' + ul.w + ' kN/m', (bx(ul.a) + bx(ul.b)) / 2 - 24, beamY - 32);
   }
 
   // Point loads
   for (var i = 0; i < pointLoads.length; i++) {
     var pl = pointLoads[i];
     ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx(pl.a), beamY - 38); ctx.lineTo(cx(pl.a), beamY - 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx(pl.a), beamY - 38); ctx.lineTo(bx(pl.a), beamY - 8); ctx.stroke();
     ctx.fillStyle = '#e74c3c';
-    ctx.beginPath();
-    ctx.moveTo(cx(pl.a), beamY - 8);
-    ctx.lineTo(cx(pl.a) - 5, beamY - 18);
-    ctx.lineTo(cx(pl.a) + 5, beamY - 18);
-    ctx.closePath(); ctx.fill();
-    ctx.font = '10px Segoe UI';
-    ctx.fillText(pl.P + ' kN', cx(pl.a) + 5, beamY - 30);
+    ctx.beginPath(); ctx.moveTo(bx(pl.a), beamY - 8); ctx.lineTo(bx(pl.a) - 5, beamY - 18); ctx.lineTo(bx(pl.a) + 5, beamY - 18); ctx.closePath(); ctx.fill();
+    ctx.font = '10px Segoe UI'; ctx.fillText(pl.P + ' kN', bx(pl.a) + 5, beamY - 30);
   }
 
-  // Applied moments (arc arrow)
+  // Moments
   for (var i = 0; i < moments.length; i++) {
     var mo = moments[i];
     ctx.strokeStyle = '#8e44ad'; ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(cx(mo.a), beamY, 16, -Math.PI * 0.9, Math.PI * 0.1);
-    ctx.stroke();
+    ctx.beginPath(); ctx.arc(bx(mo.a), beamY, 16, -Math.PI * 0.9, Math.PI * 0.1); ctx.stroke();
     ctx.fillStyle = '#8e44ad';
-    ctx.beginPath();
-    ctx.moveTo(cx(mo.a) + 16, beamY + 2);
-    ctx.lineTo(cx(mo.a) + 10, beamY - 4);
-    ctx.lineTo(cx(mo.a) + 22, beamY - 4);
-    ctx.closePath(); ctx.fill();
-    ctx.font = '10px Segoe UI';
-    ctx.fillText(mo.M + ' kN·m', cx(mo.a) + 18, beamY - 10);
+    ctx.beginPath(); ctx.moveTo(bx(mo.a) + 16, beamY + 2); ctx.lineTo(bx(mo.a) + 10, beamY - 4); ctx.lineTo(bx(mo.a) + 22, beamY - 4); ctx.closePath(); ctx.fill();
+    ctx.font = '10px Segoe UI'; ctx.fillText(mo.M + ' kN·m', bx(mo.a) + 18, beamY - 10);
   }
 
-  // Span label
   ctx.fillStyle = '#888'; ctx.font = '11px Segoe UI';
   ctx.fillText('L = ' + L + ' m', W / 2 - 20, H - 4);
 }
 
 // ── SFD / BMD drawing ──────────────────────────────────────
-function drawDiagrams(L, support, sfArr, bmArr, maxSF, maxBM) {
-  var canvas = document.getElementById('sfbmCanvas');
+function resizeDiagramCanvas(id) {
+  var c = document.getElementById(id);
+  if (!c) return c;
+  var w = Math.floor(c.parentElement.getBoundingClientRect().width) || 700;
+  c.width  = w;
+  c.height = Math.max(220, Math.floor(w * 0.3));
+  return c;
+}
+
+function drawSingleDiagram(canvasId, L, arr, stroke, fill, unit, label) {
+  var canvas = resizeDiagramCanvas(canvasId);
+  if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  var padL = 72, padR = 30, padT = 16;
-  var halfH = H / 2;
-  var beamW = W - padL - padR;
-  var scale = beamW / L;
-  var amp = 58;
+  var padL = 76, padR = 20, padT = 20, padB = 30;
+  var plotW = W - padL - padR;
+  var plotH = H - padT - padB;
+  var midY  = padT + plotH / 2;
+  var bx    = function(x) { return padL + (x / L) * plotW; };
 
-  var sfMidY = padT + 28 + amp + 10;
-  var bmMidY = halfH + padT + 28 + amp + 10;
-  var cx = function(x) { return padL + x * scale; };
+  var maxVal = 0;
+  for (var k = 0; k < arr.length; k++) if (Math.abs(arr[k].v) > maxVal) maxVal = Math.abs(arr[k].v);
+  var amp   = plotH / 2 * 0.88;
+  var scl   = maxVal > 0 ? amp / maxVal : 1;
 
-  // Section labels
-  ctx.fillStyle = '#222'; ctx.font = 'bold 12px Segoe UI';
-  ctx.fillText('Shear Force Diagram (SFD)', padL, padT + 12);
-  ctx.fillText('Bending Moment Diagram (BMD)', padL, halfH + padT + 12);
+  // background
+  ctx.fillStyle = '#fafafa';
+  ctx.fillRect(0, 0, W, H);
 
-  // Zero baselines + axis value labels
-  var pairs = [
-    { midY: sfMidY, maxVal: maxSF, unit: ' kN' },
-    { midY: bmMidY, maxVal: maxBM, unit: ' kNm' }
-  ];
-  for (var i = 0; i < pairs.length; i++) {
-    var p = pairs[i];
-    ctx.strokeStyle = '#ddd'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(padL, p.midY); ctx.lineTo(W - padR, p.midY); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#bbb'; ctx.font = '10px Segoe UI';
-    ctx.fillText('0', padL - 20, p.midY + 4);
-    if (p.maxVal > 0) {
-      ctx.fillStyle = '#aaa'; ctx.font = '9px Segoe UI';
-      ctx.fillText('+' + p.maxVal.toFixed(1) + p.unit, padL - 66, p.midY - amp + 4);
-      ctx.fillText('-' + p.maxVal.toFixed(1) + p.unit, padL - 66, p.midY + amp + 4);
-    }
+  // grid lines
+  ctx.strokeStyle = '#eee'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  for (var g = 1; g <= 4; g++) {
+    var gy = padT + (plotH / 4) * g;
+    ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(W - padR, gy); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // zero baseline
+  ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(padL, midY); ctx.lineTo(W - padR, midY); ctx.stroke();
+
+  // filled area
+  ctx.beginPath();
+  ctx.moveTo(bx(0), midY);
+  for (var k = 0; k < arr.length; k++) ctx.lineTo(bx(arr[k].x), midY - arr[k].v * scl);
+  ctx.lineTo(bx(L), midY);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+
+  // curve line
+  ctx.beginPath();
+  for (var k = 0; k < arr.length; k++) {
+    if (k === 0) ctx.moveTo(bx(arr[k].x), midY - arr[k].v * scl);
+    else         ctx.lineTo(bx(arr[k].x), midY - arr[k].v * scl);
+  }
+  ctx.strokeStyle = stroke; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+  ctx.stroke();
+
+  // Y-axis labels
+  ctx.fillStyle = '#888'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'right';
+  ctx.fillText('0', padL - 6, midY + 4);
+  if (maxVal > 0) {
+    ctx.fillText('+' + maxVal.toFixed(2) + unit, padL - 6, padT + amp * 0.12 + 4);
+    ctx.fillText('-' + maxVal.toFixed(2) + unit, padL - 6, midY + amp + 4);
   }
 
-  var sfScale = maxSF > 0 ? amp / maxSF : 1;
-  var bmScale = maxBM > 0 ? amp / maxBM : 1;
+  // peak label
+  var maxPt = arr[0];
+  for (var k = 1; k < arr.length; k++) if (Math.abs(arr[k].v) > Math.abs(maxPt.v)) maxPt = arr[k];
+  var py = midY - maxPt.v * scl;
+  ctx.fillStyle = stroke; ctx.font = 'bold 11px Segoe UI'; ctx.textAlign = 'left';
+  ctx.fillText(maxPt.v.toFixed(2) + unit, bx(maxPt.x) + 5, maxPt.v >= 0 ? py - 6 : py + 14);
 
-  function drawCurve(arr, midY, scl, stroke, fill) {
-    ctx.strokeStyle = stroke; ctx.fillStyle = fill; ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(cx(0), midY);
-    for (var k = 0; k < arr.length; k++) ctx.lineTo(cx(arr[k].x), midY - arr[k].v * scl);
-    ctx.lineTo(cx(L), midY);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    for (var k = 0; k < arr.length; k++) {
-      if (k === 0) ctx.moveTo(cx(arr[k].x), midY - arr[k].v * scl);
-      else         ctx.lineTo(cx(arr[k].x), midY - arr[k].v * scl);
-    }
-    ctx.stroke();
+  // X-axis ticks
+  ctx.fillStyle = '#999'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'center';
+  var ticks = Math.min(10, Math.floor(L));
+  for (var t = 0; t <= ticks; t++) {
+    var tx = (t / ticks) * L;
+    ctx.fillText(tx.toFixed(1) + 'm', bx(tx), H - 6);
+    ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(bx(tx), padT); ctx.lineTo(bx(tx), H - padB); ctx.stroke();
   }
 
-  drawCurve(sfArr, sfMidY, sfScale, '#e74c3c', 'rgba(231,76,60,0.13)');
+  ctx.textAlign = 'left';
+}
 
-  var bmMapped = [];
-  for (var k = 0; k < bmArr.length; k++) bmMapped.push({ x: bmArr[k].x, v: bmArr[k].m });
-  drawCurve(bmMapped, bmMidY, bmScale, '#27ae60', 'rgba(39,174,96,0.13)');
+function drawDiagrams(L, support, sfArr, bmArr, maxSF, maxBM, posA, posB) {
+  var bmMapped = bmArr.map(function(b) { return { x: b.x, v: b.m }; });
 
-  // Peak value labels
-  function peakLabel(arr, midY, scl, color, unit) {
-    var maxPt = arr[0];
-    for (var k = 1; k < arr.length; k++) if (Math.abs(arr[k].v) > Math.abs(maxPt.v)) maxPt = arr[k];
-    ctx.fillStyle = color; ctx.font = '10px Segoe UI';
-    var yy = midY - maxPt.v * scl;
-    ctx.fillText(maxPt.v.toFixed(2) + unit, cx(maxPt.x) + 4, maxPt.v >= 0 ? yy - 5 : yy + 13);
-  }
-  peakLabel(sfArr,    sfMidY, sfScale, '#c0392b', ' kN');
-  peakLabel(bmMapped, bmMidY, bmScale, '#1e8449', ' kN·m');
-
-  // A / B labels
-  ctx.fillStyle = '#555'; ctx.font = '11px Segoe UI';
-  var aLbl = support === 'cantilever' ? 'A(Fixed)' : 'A(Pin)';
-  var bLbl = support === 'cantilever' ? 'B(Free)'  : 'B(Roller)';
-  ctx.fillText(aLbl, cx(0) - 4,  sfMidY + 22);
-  ctx.fillText(bLbl, cx(L) - 4,  sfMidY + 22);
-  ctx.fillText(aLbl, cx(0) - 4,  bmMidY + 22);
-  ctx.fillText(bLbl, cx(L) - 4,  bmMidY + 22);
+  drawSingleDiagram('sfdCanvas', L, sfArr,    '#e74c3c', 'rgba(231,76,60,0.15)',   ' kN',   'SFD');
+  drawSingleDiagram('bmdCanvas', L, bmMapped, '#27ae60', 'rgba(39,174,96,0.15)',   ' kN·m', 'BMD');
 }
 
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('loadsContainer')) {
+    addSupport(); addSupport();
+    var supRows = document.querySelectorAll('#supportsContainer .load-row');
+    if (supRows[0]) supRows[0].querySelector('.sup-pos').value = '0';
+    if (supRows[1]) supRows[1].querySelector('.sup-pos').value = '6';
     addRow('point');
   }
 
-  // Smooth scroll (index page only)
   document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       e.preventDefault();
