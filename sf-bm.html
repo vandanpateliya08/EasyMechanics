@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shear Force &amp; Bending Moment — EasyMechanics</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">EasyMechanics</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+    <ul id="navMenu">
+      <li><a href="sf-bm.html" class="nav-active">SF &amp; BM</a></li>
+      <li><a href="sf-bm-calc.html">Beam Calculator</a></li>
+      <li><a href="cf.html">Concurrent Forces</a></li>
+      <li><a href="cf-calc.html">Force Calculator</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <h1>Shear Force &amp; Bending Moment</h1>
+    <p>A visual guide to understanding internal forces in beams</p>
+    <div class="hero-btns">
+      <a href="#intro" class="btn">Get Started</a>
+      <a href="sf-bm-calc.html" class="btn btn-outline">Calculator</a>
+    </div>
+  </header>
+
+  <section id="intro" class="section">
+    <div class="container">
+      <h2>What Are Internal Forces?</h2>
+      <p>When a beam is subjected to external loads, internal forces develop within the beam to maintain equilibrium. The two most important are <strong>Shear Force (SF)</strong> and <strong>Bending Moment (BM)</strong>.</p>
+      <div class="cards">
+        <div class="card"><div class="card-icon">⚡</div><h3>Shear Force</h3><p>The algebraic sum of all vertical forces acting on one side of a cross-section.</p></div>
+        <div class="card"><div class="card-icon">🔄</div><h3>Bending Moment</h3><p>The algebraic sum of moments of all forces acting on one side of a cross-section.</p></div>
+        <div class="card"><div class="card-icon">📐</div><h3>Sign Convention</h3><p>Upward forces on the left are positive. Clockwise moments on the left are positive.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="shear" class="section alt">
+    <div class="container">
+      <h2>Shear Force</h2>
+      <p>Shear force at any cross-section is the algebraic sum of all transverse forces acting to the left (or right) of that section.</p>
+      <div class="formula-box">V(x) = ΣF<sub>y</sub> (forces to the left of section)</div>
+      <h3>Key Points</h3>
+      <ul class="list">
+        <li>Shear force is constant between two point loads.</li>
+        <li>It changes abruptly at a concentrated load.</li>
+        <li>Under UDL, shear force varies linearly.</li>
+        <li>Shear force is zero at a free end with no load.</li>
+      </ul>
+      <div class="beam-diagram">
+        <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="50" y="80" width="500" height="12" fill="#4a90d9" rx="3"/>
+          <polygon points="100,92 85,120 115,120" fill="#e67e22"/>
+          <line x1="75" y1="120" x2="125" y2="120" stroke="#e67e22" stroke-width="3"/>
+          <polygon points="500,92 485,120 515,120" fill="#e67e22"/>
+          <circle cx="500" cy="125" r="6" fill="#e67e22"/>
+          <line x1="300" y1="20" x2="300" y2="78" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrow)"/>
+          <text x="310" y="40" fill="#e74c3c" font-size="14">P</text>
+          <line x1="150" y1="30" x2="150" y2="78" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowG)"/>
+          <line x1="175" y1="30" x2="175" y2="78" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowG)"/>
+          <line x1="200" y1="30" x2="200" y2="78" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowG)"/>
+          <line x1="225" y1="30" x2="225" y2="78" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowG)"/>
+          <line x1="150" y1="30" x2="225" y2="30" stroke="#27ae60" stroke-width="2"/>
+          <text x="155" y="22" fill="#27ae60" font-size="12">w (UDL)</text>
+          <text x="90" y="145" fill="#555" font-size="12">A (Pin)</text>
+          <text x="488" y="145" fill="#555" font-size="12">B (Roller)</text>
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e74c3c"/></marker>
+            <marker id="arrowG" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#27ae60"/></marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="bending" class="section">
+    <div class="container">
+      <h2>Bending Moment</h2>
+      <p>Bending moment at a section is the algebraic sum of moments of all forces acting on one side about the centroidal axis.</p>
+      <div class="formula-box">M(x) = ΣM (moments of forces to the left of section)</div>
+      <h3>Relationship Between SF and BM</h3>
+      <div class="relation-grid">
+        <div class="relation-item"><span class="math">dV/dx = -w(x)</span><p>Rate of change of shear force equals the negative of distributed load intensity.</p></div>
+        <div class="relation-item"><span class="math">dM/dx = V(x)</span><p>Rate of change of bending moment equals the shear force at that section.</p></div>
+        <div class="relation-item"><span class="math">d²M/dx² = -w(x)</span><p>Second derivative of bending moment equals the negative distributed load.</p></div>
+      </div>
+      <h3>Key Points</h3>
+      <ul class="list">
+        <li>Bending moment is maximum where shear force is zero.</li>
+        <li>BM is zero at free ends and simple supports.</li>
+        <li>Under a point load, BMD has a kink.</li>
+        <li>Under UDL, BM varies as a parabola.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="diagrams" class="section alt">
+    <div class="container">
+      <h2>SFD &amp; BMD Examples</h2>
+      <div class="diagram-tabs">
+        <button class="tab-btn active" onclick="showTab('simply', this)">Simply Supported + Point Load</button>
+        <button class="tab-btn" onclick="showTab('cantilever', this)">Cantilever + UDL</button>
+      </div>
+      <div id="simply" class="tab-content active">
+        <div class="diagram-grid">
+          <div class="diagram-box"><h4>Beam Setup</h4>
+            <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="30" y="45" width="340" height="10" fill="#4a90d9" rx="2"/>
+              <polygon points="60,55 45,80 75,80" fill="#e67e22"/>
+              <line x1="35" y1="80" x2="85" y2="80" stroke="#e67e22" stroke-width="2"/>
+              <polygon points="340,55 325,80 355,80" fill="#e67e22"/>
+              <circle cx="340" cy="85" r="5" fill="#e67e22"/>
+              <line x1="200" y1="10" x2="200" y2="43" stroke="#e74c3c" stroke-width="2.5" marker-end="url(#arr1)"/>
+              <text x="208" y="28" fill="#e74c3c" font-size="13">P</text>
+              <text x="50" y="95" fill="#555" font-size="11">A</text><text x="333" y="95" fill="#555" font-size="11">B</text>
+              <defs><marker id="arr1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#e74c3c"/></marker></defs>
+            </svg>
+          </div>
+          <div class="diagram-box"><h4>Shear Force Diagram</h4>
+            <svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+              <line x1="30" y1="60" x2="370" y2="60" stroke="#ccc" stroke-width="1" stroke-dasharray="4"/>
+              <polyline points="60,60 60,30 200,30 200,90 340,90 340,60" fill="none" stroke="#e74c3c" stroke-width="2.5"/>
+              <text x="100" y="25" fill="#e74c3c" font-size="12">+P/2</text>
+              <text x="240" y="100" fill="#e74c3c" font-size="12">-P/2</text>
+            </svg>
+          </div>
+          <div class="diagram-box"><h4>Bending Moment Diagram</h4>
+            <svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+              <line x1="30" y1="90" x2="370" y2="90" stroke="#ccc" stroke-width="1" stroke-dasharray="4"/>
+              <polyline points="60,90 200,30 340,90" fill="rgba(39,174,96,0.15)" stroke="#27ae60" stroke-width="2.5"/>
+              <text x="185" y="25" fill="#27ae60" font-size="12">PL/4</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div id="cantilever" class="tab-content">
+        <div class="diagram-grid">
+          <div class="diagram-box"><h4>Beam Setup</h4>
+            <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="20" y="20" width="15" height="60" fill="#555"/>
+              <rect x="35" y="45" width="310" height="10" fill="#4a90d9" rx="2"/>
+              <line x1="60" y1="20" x2="60" y2="43" stroke="#27ae60" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="120" y1="20" x2="120" y2="43" stroke="#27ae60" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="180" y1="20" x2="180" y2="43" stroke="#27ae60" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="240" y1="20" x2="240" y2="43" stroke="#27ae60" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="300" y1="20" x2="300" y2="43" stroke="#27ae60" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="60" y1="20" x2="300" y2="20" stroke="#27ae60" stroke-width="2"/>
+              <text x="150" y="14" fill="#27ae60" font-size="11">w (UDL)</text>
+              <defs><marker id="arr2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#27ae60"/></marker></defs>
+            </svg>
+          </div>
+          <div class="diagram-box"><h4>Shear Force Diagram</h4>
+            <svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+              <line x1="30" y1="90" x2="370" y2="90" stroke="#ccc" stroke-width="1" stroke-dasharray="4"/>
+              <polyline points="60,30 340,90" fill="rgba(231,76,60,0.1)" stroke="#e74c3c" stroke-width="2.5"/>
+              <text x="55" y="25" fill="#e74c3c" font-size="12">wL</text>
+            </svg>
+          </div>
+          <div class="diagram-box"><h4>Bending Moment Diagram</h4>
+            <svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+              <line x1="30" y1="30" x2="370" y2="30" stroke="#ccc" stroke-width="1" stroke-dasharray="4"/>
+              <path d="M60,30 Q200,100 340,90" fill="rgba(52,152,219,0.15)" stroke="#3498db" stroke-width="2.5"/>
+              <text x="342" y="88" fill="#3498db" font-size="12">-wL²/2</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>EasyMechanics — VANDAN P. PATELIYA</p>
+    <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
+  </footer>
+
+  <script src="sf-bm.js"></script>
+  <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+</body>
+</html>

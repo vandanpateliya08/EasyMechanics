@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Force Calculator — EasyMechanics</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">EasyMechanics</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+    <ul id="navMenu">
+      <li><a href="sf-bm.html">SF &amp; BM</a></li>
+      <li><a href="sf-bm-calc.html">Beam Calculator</a></li>
+      <li><a href="cf.html">Concurrent Forces</a></li>
+      <li><a href="cf-calc.html" class="nav-active">Force Calculator</a></li>
+    </ul>
+  </nav>
+
+  <header class="calc-hero">
+    <h1>Force Calculator</h1>
+    <p>Add forces, resolve components and visualise the resultant</p>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="beam-config">
+        <div class="input-group">
+          <label for="force">Force (N)</label>
+          <input type="number" id="force" placeholder="e.g. 100"/>
+        </div>
+        <div class="input-group">
+          <label for="angle">Angle (° from +X)</label>
+          <input type="number" id="angle" placeholder="e.g. 45"/>
+        </div>
+        <div class="input-group btn-group-col">
+          <label>&nbsp;</label>
+          <div class="btn-row">
+            <button class="btn" onclick="addForce()">Add Force</button>
+            <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
+            <button class="btn btn-clear" onclick="clearGraph()">Clear Graph</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="results">
+        <h3>Force Table</h3>
+        <div class="table-wrap">
+          <table id="forceTable">
+            <tr><th>No</th><th>Force (N)</th><th>Angle (°)</th><th>Fx (N)</th><th>Fy (N)</th><th>Remove</th></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="results">
+        <h3>Step-by-Step Calculation</h3>
+        <div id="steps"><p class="empty-msg">No forces added yet.</p></div>
+      </div>
+
+      <div class="results">
+        <h3>Resultant</h3>
+        <div class="result-grid">
+          <div class="result-item"><span class="result-label">ΣFx</span><span class="result-value" id="resSumFx">—</span></div>
+          <div class="result-item"><span class="result-label">ΣFy</span><span class="result-value" id="resSumFy">—</span></div>
+          <div class="result-item"><span class="result-label">Resultant R</span><span class="result-value" id="resR">—</span></div>
+          <div class="result-item"><span class="result-label">Direction θ</span><span class="result-value" id="resTheta">—</span></div>
+        </div>
+      </div>
+
+      <div class="results">
+        <h3>Force Diagram</h3>
+        <canvas id="canvas" width="620" height="465"></canvas>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>EasyMechanics — VANDAN P. PATELIYA</p>
+    <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
+  </footer>
+
+  <script src="cf.js"></script>
+  <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+</body>
+</html>

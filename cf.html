@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Concurrent Forces — EasyMechanics</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">EasyMechanics</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+    <ul id="navMenu">
+      <li><a href="sf-bm.html">SF &amp; BM</a></li>
+      <li><a href="sf-bm-calc.html">Beam Calculator</a></li>
+      <li><a href="cf.html" class="nav-active">Concurrent Forces</a></li>
+      <li><a href="cf-calc.html">Force Calculator</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <h1>Coplanar Concurrent Forces</h1>
+    <p>Resolve, analyse and visualise force systems acting at a point</p>
+    <div class="hero-btns">
+      <a href="#theory" class="btn">Get Started</a>
+      <a href="cf-calc.html" class="btn btn-outline">Calculator</a>
+    </div>
+  </header>
+
+  <section id="theory" class="section">
+    <div class="container">
+      <h2>What Are Concurrent Forces?</h2>
+      <p><strong>Concurrent forces</strong> are forces whose lines of action all pass through a single common point. When they also lie in the same plane they are called <strong>coplanar concurrent forces</strong>.</p>
+
+      <div class="cards">
+        <div class="card"><div class="card-icon">📐</div><h3>Resolution</h3><p>Any force F at angle θ splits into Fx = F cosθ and Fy = F sinθ along the axes.</p></div>
+        <div class="card"><div class="card-icon">➕</div><h3>Resultant</h3><p>R = √((ΣFx)² + (ΣFy)²), direction θ = arctan(ΣFy / ΣFx).</p></div>
+        <div class="card"><div class="card-icon">⚖️</div><h3>Equilibrium</h3><p>System is in equilibrium when ΣFx = 0 and ΣFy = 0, giving R = 0.</p></div>
+      </div>
+
+      <h3>1. What is a Force?</h3>
+      <p>A force is a vector quantity with <strong>magnitude</strong> (Newtons) and <strong>direction</strong> (angle). Represented as an arrow — length = magnitude, arrowhead = direction.</p>
+
+      <h3>2. Resolution of a Force</h3>
+      <p>Any force <strong>F</strong> at angle <strong>θ</strong> from the +X axis resolves into:</p>
+      <div class="formula-box">Fx = F cos θ &nbsp;&nbsp;|&nbsp;&nbsp; Fy = F sin θ</div>
+
+      <h3>3. Resultant of a Force System</h3>
+      <div class="formula-box">
+        ΣFx = F₁cosθ₁ + F₂cosθ₂ + ... &nbsp;&nbsp;|&nbsp;&nbsp; ΣFy = F₁sinθ₁ + F₂sinθ₂ + ...<br>
+        R = √( (ΣFx)² + (ΣFy)² ) &nbsp;&nbsp;|&nbsp;&nbsp; θ = arctan( ΣFy / ΣFx )
+      </div>
+
+      <h3>4. Sign Convention</h3>
+      <ul class="list">
+        <li>Angles measured <strong>counter-clockwise</strong> from +X axis are positive.</li>
+        <li>Fx &gt; 0 → rightward &nbsp;|&nbsp; Fx &lt; 0 → leftward</li>
+        <li>Fy &gt; 0 → upward &nbsp;|&nbsp; Fy &lt; 0 → downward</li>
+      </ul>
+
+      <h3>5. Equilibrium Condition</h3>
+      <div class="formula-box">ΣFx = 0 &nbsp;&nbsp;and&nbsp;&nbsp; ΣFy = 0 &nbsp;&nbsp;⟹&nbsp;&nbsp; R = 0</div>
+
+      <h3>6. Lami's Theorem (3 Forces)</h3>
+      <p>When exactly three concurrent forces are in equilibrium:</p>
+      <div class="formula-box">F₁ / sin α₁ = F₂ / sin α₂ = F₃ / sin α₃</div>
+
+      <h3>7. Parallelogram Law</h3>
+      <p>Two forces at a point are replaced by a single resultant — the <strong>diagonal</strong> of the parallelogram formed with those forces as adjacent sides.</p>
+
+      <h3>8. Triangle &amp; Polygon Law</h3>
+      <p>Forces drawn head-to-tail as sides of a polygon — the closing side (reversed) gives the resultant.</p>
+
+      <h3>9. Applications</h3>
+      <ul class="list">
+        <li>Structural analysis — forces in trusses and frames</li>
+        <li>Rope and pulley systems — tension calculations</li>
+        <li>Inclined plane problems — weight components</li>
+        <li>Equilibrium of particles and rigid bodies</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>EasyMechanics — VANDAN P. PATELIYA</p>
+    <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
+  </footer>
+
+  <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+</body>
+</html>

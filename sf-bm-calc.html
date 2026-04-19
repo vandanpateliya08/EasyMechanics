@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beam Calculator — EasyMechanics</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">EasyMechanics</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+    <ul id="navMenu">
+      <li><a href="sf-bm.html">SF &amp; BM</a></li>
+      <li><a href="sf-bm-calc.html" class="nav-active">Beam Calculator</a></li>
+      <li><a href="cf.html">Concurrent Forces</a></li>
+      <li><a href="cf-calc.html">Force Calculator</a></li>
+    </ul>
+  </nav>
+
+  <header class="calc-hero">
+    <h1>Beam Calculator</h1>
+    <p>Point loads · UDLs · Applied moments · Simply supported &amp; Cantilever</p>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="beam-config">
+        <div class="input-group">
+          <label for="spanL">Beam Span L (m)</label>
+          <input type="number" id="spanL" placeholder="e.g. 6" min="0.1" step="0.1"/>
+        </div>
+        <div class="input-group">
+          <label for="supportType">Support Type</label>
+          <select id="supportType">
+            <option value="simply">Simply Supported (Pin–Roller)</option>
+            <option value="cantilever">Cantilever (Fixed–Free)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="loads-header">
+        <h3>Loads</h3>
+        <div class="add-btns">
+          <button class="btn btn-sm btn-pl"  onclick="addRow('point')">+ Point Load</button>
+          <button class="btn btn-sm btn-udl" onclick="addRow('udl')">+ UDL</button>
+          <button class="btn btn-sm btn-mom" onclick="addRow('moment')">+ Moment</button>
+        </div>
+      </div>
+
+      <div id="loadsContainer"></div>
+
+      <div class="action-btns">
+        <button class="btn" onclick="calculate()">Calculate</button>
+        <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
+      </div>
+
+      <div id="results" class="results hidden">
+        <h3>Results</h3>
+        <div class="result-grid">
+          <div class="result-item"><span class="result-label" id="raLabel">Reaction at A (R<sub>A</sub>)</span><span class="result-value" id="ra">-</span></div>
+          <div class="result-item"><span class="result-label" id="rbLabel">Reaction at B (R<sub>B</sub>)</span><span class="result-value" id="rb">-</span></div>
+          <div class="result-item"><span class="result-label">Max |Shear Force|</span><span class="result-value" id="maxSF">-</span></div>
+          <div class="result-item"><span class="result-label">Max |Bending Moment|</span><span class="result-value" id="maxBM">-</span></div>
+        </div>
+        <canvas id="beamCanvas" width="700" height="110"></canvas>
+        <canvas id="sfbmCanvas" width="700" height="340"></canvas>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>EasyMechanics — VANDAN P. PATELIYA</p>
+    <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
+  </footer>
+
+  <script src="sf-bm.js"></script>
+  <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+</body>
+</html>

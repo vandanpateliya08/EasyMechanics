@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EasyMechanics</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">EasyMechanics</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+    <ul id="navMenu">
+      <li><a href="sf-bm.html">SF &amp; BM</a></li>
+      <li><a href="sf-bm-calc.html">Beam Calculator</a></li>
+      <li><a href="cf.html">Concurrent Forces</a></li>
+      <li><a href="cf-calc.html">Force Calculator</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <h1>EasyMechanics</h1>
+    <p>Engineering mechanics — theory, examples and interactive calculators</p>
+    <div class="hero-btns">
+      <a href="sf-bm.html" class="btn">Shear Force &amp; BM</a>
+      <a href="cf.html" class="btn btn-outline">Concurrent Forces</a>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <h2>Choose a Topic</h2>
+      <p>Select a module below to read the theory or jump straight into the calculator.</p>
+
+      <div class="topic-cards">
+        <a href="sf-bm.html" class="topic-card">
+          <div class="topic-icon">🏗️</div>
+          <h3>Shear Force &amp; Bending Moment</h3>
+          <p>Analyse internal forces in beams under point loads, UDLs and applied moments. Plot SFD &amp; BMD instantly.</p>
+          <span class="tag">Theory + Calculator</span>
+        </a>
+        <a href="cf.html" class="topic-card">
+          <div class="topic-icon">⚡</div>
+          <h3>Coplanar Concurrent Forces</h3>
+          <p>Resolve force systems acting at a point, find the resultant and visualise vectors on an interactive graph.</p>
+          <span class="tag">Theory + Calculator</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>EasyMechanics — VANDAN P. PATELIYA</p>
+    <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
+  </footer>
+
+  <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+</body>
+</html>
