@@ -12,8 +12,8 @@ let supportCount = 0;
 function addSupport() {
   var container = document.getElementById('supportsContainer');
   if (!container) return;
-  if (container.children.length >= 2) {
-    alert('Maximum 2 supports allowed.'); return;
+  if (container.children.length >= 3) {
+    alert('Maximum 3 supports allowed.'); return;
   }
   supportCount++;
   var id = 'sup-' + supportCount;
@@ -98,7 +98,14 @@ function clearAll() {
   document.getElementById('results').classList.add('hidden');
   document.getElementById('spanL').value = '';
   rowCount = 0; supportCount = 0;
-  addSupport(); addSupport();   // reset with 2 default supports
+  addSupport();
+  document.querySelector('#supportsContainer .sup-pos').value = '0';
+  addSupport();
+  var supRows = document.querySelectorAll('#supportsContainer .load-row');
+  if (supRows[1]) {
+    supRows[1].querySelector('.sup-pos').value = '6';
+    supRows[1].querySelector('.sup-type').value = 'roller';
+  }
   addRow('point');
 }
 
@@ -444,10 +451,15 @@ function drawDiagrams(L, support, sfArr, bmArr, maxSF, maxBM, posA, posB) {
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('loadsContainer')) {
-    addSupport(); addSupport();
+    // Start with 2 default supports — user can add a 3rd or remove these
+    addSupport();
+    addSupport();
     var supRows = document.querySelectorAll('#supportsContainer .load-row');
     if (supRows[0]) supRows[0].querySelector('.sup-pos').value = '0';
-    if (supRows[1]) supRows[1].querySelector('.sup-pos').value = '6';
+    if (supRows[1]) {
+      supRows[1].querySelector('.sup-pos').value = '6';
+      supRows[1].querySelector('.sup-type').value = 'roller';
+    }
     addRow('point');
   }
 
