@@ -5,8 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EasyMechanics</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── SPLASH SCREEN ── */
+    #splash {
+      position: fixed; inset: 0;
+      background: #1a1a2e;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      animation: splashFade 0.6s ease 4.5s forwards;
+    }
+    #splash .splash-by {
+      font-size: 1.5rem; color: #aaa; letter-spacing: 4px;
+      text-transform: uppercase; margin-bottom: 14px;
+      animation: slideUp 0.6s ease 0.3s both;
+    }
+    #splash .splash-name {
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 800; letter-spacing: 2px;
+      background: linear-gradient(90deg, #4a90d9, #27ae60);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: slideUp 0.7s ease 0.5s both;
+    }
+    #splash .splash-sub {
+      font-size: 1.2rem; color: #aaa; margin-top: 8px; letter-spacing: 1px;
+      animation: slideUp 0.7s ease 0.8s both;
+    }
+    #splash .splash-bar {
+      width: 0; height: 3px; margin-top: 32px;
+      background: linear-gradient(90deg, #4a90d9, #27ae60);
+      border-radius: 2px;
+      animation: barGrow 1.6s ease 0.9s both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes barGrow {
+      from { width: 0; }
+      to   { width: 180px; }
+    }
+    @keyframes splashFade {
+      to { opacity: 0; pointer-events: none; }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- SPLASH -->
+  <div id="splash">
+    <span class="splash-by">Prepared by</span>
+    <span class="splash-name">VANDAN P. PATELIYA</span>
+    <span class="splash-sub">EN No. 2501701060542</span>
+    <span class="splash-sub">2nd Sem · Civil Engineering Department</span>
+    <span class="splash-sub">vishwakarma government engineering college</span>
+    <span class="splash-sub">subject-mechanics of solids</span>
+    <div class="splash-bar"></div>
+  </div>
 
   <nav class="navbar">
     <a href="index.html" class="logo">EasyMechanics</a>
@@ -55,6 +111,10 @@
     <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
   </footer>
 
-  <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+  <script>
+    function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}
+    // Remove splash from DOM after animation completes
+    setTimeout(function(){ var s = document.getElementById('splash'); if(s) s.remove(); }, 5500);
+  </script>
 </body>
 </html>
