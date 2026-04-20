@@ -16,20 +16,22 @@
       animation: splashFade 0.6s ease 4.5s forwards;
     }
     #splash .splash-by {
-      font-size: 1.5rem; color: #aaa; letter-spacing: 4px;
+      font-size: clamp(1rem, 3.5vw, 1.5rem); color: #aaa; letter-spacing: 4px;
       text-transform: uppercase; margin-bottom: 14px;
       animation: slideUp 0.6s ease 0.3s both;
     }
     #splash .splash-name {
-      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-size: clamp(1.8rem, 7vw, 3.5rem);
       font-weight: 800; letter-spacing: 2px;
       background: linear-gradient(90deg, #4a90d9, #27ae60);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: slideUp 0.7s ease 0.5s both;
+      text-align: center; padding: 0 16px;
     }
     #splash .splash-sub {
-      font-size: 1.2rem; color: #aaa; margin-top: 8px; letter-spacing: 1px;
+      font-size: clamp(0.85rem, 2.8vw, 1.2rem); color: #aaa; margin-top: 8px;
+      letter-spacing: 1px; text-align: center; padding: 0 20px;
       animation: slideUp 0.7s ease 0.8s both;
     }
     #splash .splash-bar {
