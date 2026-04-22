@@ -164,6 +164,24 @@ body {
 
 .action-btns { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
 
+/* ── CALCULATION STEPS ── */
+.calc-steps { margin: 24px 0 20px; }
+.steps-title { font-size: 1.05rem; color: #1a1a2e; margin-bottom: 6px; padding-left: 10px; border-left: 3px solid #27ae60; }
+.steps-note { font-size: 0.85rem; color: #555; background: #eafaf1; border-left: 3px solid #27ae60; padding: 7px 12px; border-radius: 4px; margin-bottom: 14px; }
+.step-block { background: #f7f9fc; border-radius: 8px; margin-bottom: 14px; overflow: hidden; border: 1px solid #e4eaf2; }
+.step-head { background: #1a1a2e; color: #4a90d9; font-size: 0.9rem; font-weight: 700; padding: 10px 16px; letter-spacing: 0.3px; }
+.step-body { padding: 14px 16px; }
+.step-body p { font-size: 0.93rem; color: #444; margin-bottom: 7px; }
+.step-formula { font-family: 'Courier New', monospace; background: #eef3fb; border-left: 3px solid #4a90d9; padding: 7px 12px; border-radius: 4px; font-size: 0.9rem; color: #1a1a2e; margin-bottom: 8px !important; }
+.step-highlight { background: #eafaf1; border-left: 3px solid #27ae60; padding: 8px 12px; border-radius: 4px; font-size: 0.93rem; color: #1a1a2e; margin-top: 10px !important; }
+.steps-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 8px; }
+.steps-table th { background: #1a1a2e; color: #4a90d9; padding: 8px 10px; text-align: center; }
+.steps-table td { border: 1px solid #dde4ef; padding: 7px 10px; text-align: center; color: #444; }
+.steps-table tr:nth-child(even) td { background: #f0f4f8; }
+.steps-table td:last-child { text-align: left; font-size: 0.82rem; color: #666; }
+.steps-table tr.sf-jump td { background: #fff8e1 !important; }
+.jump-tag { display: inline-block; background: #e67e22; color: #fff; font-size: 0.72rem; font-weight: 700; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+
 /* ── RESULTS ── */
 .results { margin-top: 24px; background: white; border-radius: 10px; padding: 24px 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
 .results h3 { margin-bottom: 16px; color: #1a1a2e; }
@@ -171,6 +189,7 @@ body {
 .result-item { background: #f0f4f8; border-radius: 8px; padding: 16px; text-align: center; }
 .result-label { display: block; font-size: 0.85rem; color: #777; margin-bottom: 6px; }
 .result-value { display: block; font-size: 1.3rem; font-weight: 700; color: #4a90d9; }
+.result-pos { display: block; font-size: 0.78rem; font-weight: 400; color: #888; margin-top: 3px; }
 .hidden { display: none; }
 
 /* ── TABLE ── */
@@ -280,6 +299,9 @@ tr:nth-child(even) td { background: #f7f9fc; }
   .result-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .result-value { font-size: 1.05rem; }
   .result-item { padding: 12px 8px; }
+  .steps-table { font-size: 0.78rem; }
+  .steps-table td, .steps-table th { padding: 6px 6px; }
+  .step-formula { font-size: 0.8rem; }
 
   .cards { grid-template-columns: 1fr; gap: 12px; }
   .topic-cards { grid-template-columns: 1fr; }
