@@ -8,6 +8,36 @@
 </head>
 <body>
 
+  <!-- ── SPLASH SCREEN ── -->
+  <div id="splash">
+    <div class="splash-inner">
+      <div class="splash-icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- beam -->
+          <rect x="8" y="34" width="56" height="8" rx="3" fill="#4a90d9"/>
+          <!-- point load arrow -->
+          <line x1="36" y1="8" x2="36" y2="32" stroke="#e74c3c" stroke-width="3.5" stroke-linecap="round"/>
+          <polygon points="36,34 30,22 42,22" fill="#e74c3c"/>
+          <!-- pin support left -->
+          <polygon points="14,42 8,58 20,58" fill="#e67e22"/>
+          <line x1="5" y1="60" x2="23" y2="60" stroke="#e67e22" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- roller support right -->
+          <polygon points="58,42 52,58 64,58" fill="#e67e22"/>
+          <circle cx="58" cy="63" r="4" fill="#e67e22"/>
+        </svg>
+      </div>
+      <h1 class="splash-title">EasyMechanics</h1>
+      <p class="splash-sub">Mechanics of Solids</p>
+      <div class="splash-info">
+        <span>Sem 2 &nbsp;·&nbsp; Civil Engineering</span>
+        <span>Enroll No: 250170106054</span>
+        <span>Vishwakarma Govt. Engineering College</span>
+      </div>
+      <p class="splash-credit">VANDAN P. PATELIYA</p>
+      <div class="splash-bar"><div class="splash-fill"></div></div>
+    </div>
+  </div>
+
   <nav class="navbar">
     <a href="index.html" class="logo">EasyMechanics</a>
     <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
@@ -52,13 +82,28 @@
 
   <footer class="footer">
     <p>EasyMechanics — VANDAN P. PATELIYA</p>
-    <div class="visit-counter">
-      <span class="vc-icon">👁️</span>
-      Site visits: <strong id="visitCount">—</strong>
-    </div>
+    <p class="footer-visits">👁 &nbsp;Visits: <span id="footerVisitCount">0</span></p>
   </footer>
 
-  <script src="visit-count.js"></script>
   <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
+  <script>
+    (function () {
+      // ── Visit counter ──
+      var visits = parseInt(localStorage.getItem('em_visits') || '0') + 1;
+      localStorage.setItem('em_visits', visits);
+      document.getElementById('footerVisitCount').textContent = visits;
+
+      // ── Splash: 5s auto-dismiss, tap to skip ──
+      var splash = document.getElementById('splash');
+
+      function dismiss() {
+        splash.classList.add('splash-hide');
+        setTimeout(function () { splash.style.display = 'none'; }, 500);
+      }
+
+      setTimeout(dismiss, 5000);
+      splash.addEventListener('click', dismiss);
+    })();
+  </script>
 </body>
 </html>
