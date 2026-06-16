@@ -32,16 +32,14 @@
           <label for="spanL">Beam Span L (m)</label>
           <input type="number" id="spanL" placeholder="e.g. 6" min="0.1" step="0.1"/>
         </div>
-      </div>
-
-      <!-- Supports -->
-      <div class="loads-header">
-        <h3>Supports</h3>
-        <div class="add-btns">
-          <button class="btn btn-sm" style="background:#e67e22;" onclick="addSupport()">+ Add Support</button>
+        <div class="input-group">
+          <label for="supportType">Support Type</label>
+          <select id="supportType">
+            <option value="simply">Simply Supported (Pin–Roller)</option>
+            <option value="cantilever">Cantilever (Fixed–Free)</option>
+          </select>
         </div>
       </div>
-      <div id="supportsContainer"></div>
 
       <div class="loads-header">
         <h3>Loads</h3>
@@ -67,15 +65,8 @@
           <div class="result-item"><span class="result-label">Max |Shear Force|</span><span class="result-value" id="maxSF">-</span></div>
           <div class="result-item"><span class="result-label">Max |Bending Moment|</span><span class="result-value" id="maxBM">-</span></div>
         </div>
-
-        <!-- Step-by-step calculation -->
-        <div class="calc-steps" id="calcSteps"></div>
-
-        <canvas id="beamCanvas" width="700" height="120"></canvas>
-        <h4 class="diagram-label">Shear Force Diagram (SFD)</h4>
-        <canvas id="sfdCanvas" width="700" height="220"></canvas>
-        <h4 class="diagram-label">Bending Moment Diagram (BMD)</h4>
-        <canvas id="bmdCanvas" width="700" height="220"></canvas>
+        <canvas id="beamCanvas" width="700" height="110"></canvas>
+        <canvas id="sfbmCanvas" width="700" height="340"></canvas>
       </div>
 
     </div>
@@ -83,10 +74,14 @@
 
   <footer class="footer">
     <p>EasyMechanics — VANDAN P. PATELIYA</p>
-    <p style="margin-top:6px;font-size:0.85rem;opacity:0.7;">For educational purposes</p>
+    <div class="visit-counter">
+      <span class="vc-icon">👁️</span>
+      Site visits: <strong id="visitCount">—</strong>
+    </div>
   </footer>
 
   <script src="sf-bm.js"></script>
+  <script src="visit-count.js"></script>
   <script>function toggleNav(){document.getElementById('navMenu').classList.toggle('open');}</script>
 </body>
 </html>
